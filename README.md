@@ -1,60 +1,150 @@
-# Loan Default Prediction Project - README
-## Project Overview
-This project aims to predict the loan status (loan_status) as either fully paid or default using various classification models. The dataset contains various features related to loan applications, credit history, employment, income, and more. Six classification models were applied: BaggingClassifier, XGBoost, LogisticRegression, AdaBoostClassifier, GradientBoostingClassifier, and RandomForestClassifier. Additionally, Principal Component Analysis (PCA) was used for dimensionality reduction, and hyperparameter tuning was performed to optimize the models' performance.
+# Loan Default Prediction
 
-## Dataset Description
-#### The dataset contains the following columns: 
-['loan_amnt', 'credit_month', 'int_rate', 'emp_length', 'annual_inc', 'verification_status', 'loan_status', 'dti', 'delinq_2yrs',
-       'fico_range', 'inq_last_6mths', 'open_acc', 'revol_bal', 'total_acc',
-       'pub_rec_bankruptcies', 'grade_numeric', 'years_of_credit_history',
-       'home_ownership_MORTGAGE', 'home_ownership_OTHER', 'home_ownership_OWN',
-       'home_ownership_RENT', 'purpose_credit_card',
-       'purpose_debt_consolidation', 'purpose_home_improvement',
-       'purpose_major_purchase', 'purpose_other']
-## Project Steps
-### 1. Data Preprocessing
-Handling Missing Values: Missing values in the dataset were identified and handled appropriately.
-Feature Scaling: The numerical features were scaled to ensure that they are on a similar scale. This helps improve the performance of machine learning models.
-Feature Engineering: Additional features, such as years_of_credit_history, were created to enhance the predictive power of the models.
-### 2. Principal Component Analysis (PCA)
-Dimensionality Reduction: PCA was applied to reduce the dimensionality of the dataset while retaining as much variance as possible. This step helps in reducing model complexity and computation time.
-Variance Retained: The number of components was chosen to retain a significant amount of variance (e.g., 95%) from the original features.
-### 3. Model Selection
-#### Models Used:
-BaggingClassifier: An ensemble method that fits multiple instances of a base estimator on different random subsets of the dataset and averages their predictions.
+![Python](https://img.shields.io/badge/Python-3.9%2B-blue)
+![Jupyter](https://img.shields.io/badge/Jupyter-Notebook-orange)
+![scikit-learn](https://img.shields.io/badge/scikit--learn-1.2%2B-green)
+![License](https://img.shields.io/badge/License-MIT-lightgrey)
 
-XGBoost: An efficient and scalable implementation of gradient boosting, widely used for its high performance.
+## Overview
 
-LogisticRegression: A simple, interpretable model that predicts probabilities using a logistic function.
+This project builds a machine learning pipeline to predict whether a loan will be **fully repaid or defaulted** (`loan_status`). Starting from raw Lending Club data, the workflow covers data cleaning, exploratory data analysis (EDA), feature engineering, clustering, model training, dimensionality reduction with PCA, and hyperparameter tuning.
 
-AdaBoostClassifier: An ensemble method that combines multiple weak learners to create a strong classifier.
+Six classifiers are benchmarked:
 
-GradientBoostingClassifier: A powerful ensemble technique that builds models sequentially and reduces the bias of the combined model.
+| Model | Type |
+|---|---|
+| BaggingClassifier | Ensemble (bagging) |
+| XGBoost | Gradient boosting |
+| Logistic Regression | Linear |
+| AdaBoost | Ensemble (boosting) |
+| Gradient Boosting | Ensemble (boosting) |
+| Random Forest | Ensemble (bagging) |
 
-RandomForestClassifier: An ensemble method that builds multiple decision trees and merges them to get a more accurate and stable prediction.
+The final model (Logistic Regression tuned with GridSearchCV + SMOTE for class imbalance) achieves a **ROC-AUC > 0.70** on the held-out test set.
 
-### 4. Hyperparameter Tuning
-Grid Search: Performed grid search to identify the best combination of hyperparameters for each model. This involved defining a grid of hyperparameters and searching exhaustively through this space.
+---
 
-Cross-Validation: Used k-fold cross-validation to ensure the model's robustness and generalization capability.
-### 5. Model Evaluation
-#### Metrics Used:
+## Repository Structure
 
-Accuracy: The proportion of correctly classified instances.
+```
+Loan_repayment/
+├── 1_Data_Cleaning.ipynb          # Drop irrelevant/leaky columns, handle nulls
+├── 2_EDA.ipynb                    # Exploratory Data Analysis and visualisations
+├── 3_Feature_Engineering.ipynb    # Encoding, outlier treatment, feature creation
+├── 4_Modeling.ipynb               # Clustering, model training, PCA, tuning
+├── Loan_data.csv                  # Raw dataset (source: Kaggle)
+├── c_data.csv                     # Cleaned intermediate data
+├── modeling_data.csv              # Feature-engineered data ready for modelling
+├── requirements.txt               # Python dependencies
+└── README.md
+```
 
-Precision, Recall, F1-Score: Additional metrics to evaluate the model's performance, particularly in handling imbalanced data.
+---
 
-ROC-AUC: Used to measure the model's ability to distinguish between classes.
+## Dataset
 
-Comparison of Models: The performance of all six models was compared based on the above metrics. The best-performing model was selected for the final prediction.
+The raw dataset (`Loan_data.csv`) is sourced from **Kaggle** (LendingClub loan data). After cleaning, the following features are used for modelling:
 
-### 6. Final Model Selection
-Based on the evaluation metrics, the model with the best performance on the test data was selected as the final model for deployment.
-### Conclusion
-The project successfully developed a predictive model for loan status using a variety of machine learning techniques. By applying PCA and hyperparameter tuning, the model's performance was optimized, leading to a more robust and accurate prediction.
+| Feature | Description |
+|---|---|
+| `loan_amnt` | Requested loan amount |
+| `credit_month` | Loan term in months (36 / 60) |
+| `int_rate` | Interest rate |
+| `emp_length` | Employment length (years) |
+| `annual_inc` | Annual income |
+| `verification_status` | Income verification status |
+| `dti` | Debt-to-income ratio |
+| `delinq_2yrs` | Delinquencies in last 2 years |
+| `fico_range` | FICO credit score |
+| `inq_last_6mths` | Credit inquiries in last 6 months |
+| `open_acc` | Number of open credit lines |
+| `revol_bal` | Revolving balance |
+| `total_acc` | Total credit lines |
+| `pub_rec_bankruptcies` | Public record bankruptcies |
+| `grade_numeric` | Loan grade (encoded) |
+| `years_of_credit_history` | Age of oldest credit line |
+| `home_ownership_*` | One-hot encoded home ownership |
+| `purpose_*` | One-hot encoded loan purpose |
+| **`loan_status`** | **Target: 1 = Fully Paid, 0 = Charged Off** |
 
-### How to Run
-Clone the repository.
-Install the necessary dependencies and libraries. Run the notebook or script file to preprocess the data, train the models, and evaluate their performance.
-### Acknowledgements
-The dataset used in this project was sourced from Kaggle. Thanks to the developers and maintainers of the libraries used in this project.
+---
+
+## Pipeline
+
+### 1. Data Cleaning (`1_Data_Cleaning.ipynb`)
+- Remove columns that are entirely null, have a single unique value, or contain >60 % missing values
+- Drop leaky columns (post-origination payment data)
+- Filter target to binary classes: *Fully Paid* and *Charged Off*
+
+### 2. Exploratory Data Analysis (`2_EDA.ipynb`)
+- FICO score vs. loan status distribution
+- Credit age vs. default likelihood
+- Correlation analysis across numeric features
+
+### 3. Feature Engineering (`3_Feature_Engineering.ipynb`)
+- Impute missing values in `emp_length` and `pub_rec_bankruptcies`
+- Convert `grade`/`sub_grade` to a single numeric `grade_numeric`
+- Derive `years_of_credit_history` from date columns
+- Winsorise numerical outliers (IQR-based, 5 % tails)
+- One-hot encode `home_ownership` and `purpose`
+
+### 4. Modelling (`4_Modeling.ipynb`)
+- **Clustering**: K-Means, Hierarchical (single & complete linkage), DBSCAN
+- **Classification**: Train and compare six models using accuracy and ROC-AUC
+- **PCA**: Reduce to 17 components retaining 95 % variance; re-evaluate all models
+- **Hyperparameter tuning**: GridSearchCV with 10-fold cross-validation on Logistic Regression
+- **Class imbalance**: SMOTE oversampling applied before final model training
+
+---
+
+## Results
+
+| Model | Test Accuracy | ROC-AUC |
+|---|---|---|
+| BaggingClassifier | — | — |
+| XGBoost | — | — |
+| Logistic Regression | — | — |
+| AdaBoost | — | — |
+| Gradient Boosting | — | — |
+| Random Forest | — | — |
+
+> Run the notebooks end-to-end to populate the results table with values from your environment.
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- Python 3.9+
+- Jupyter Lab or Jupyter Notebook
+
+### Installation
+
+```bash
+git clone https://github.com/proukariot/Loan_repayment.git
+cd Loan_repayment
+pip install -r requirements.txt
+```
+
+### Running the Notebooks
+
+Execute the notebooks **in order**:
+
+```bash
+jupyter lab
+```
+
+1. `1_Data_Cleaning.ipynb`
+2. `2_EDA.ipynb`
+3. `3_Feature_Engineering.ipynb`
+4. `4_Modeling.ipynb`
+
+Each notebook reads from and writes to the CSV files in the project root, so the sequence must be respected.
+
+---
+
+## Acknowledgements
+
+- Dataset: [LendingClub Loan Data – Kaggle](https://www.kaggle.com/)
+- Libraries: scikit-learn, XGBoost, imbalanced-learn, yellowbrick, pandas, seaborn
